@@ -1,33 +1,48 @@
-const https = require('https');
+"use strict";
 
-https.get('https://mrodevicemgr.edog.officeapps.live.com/mrodevicemgrsvc/api/v2/C2RReleaseData?audienceFFN=ea4a4090-de26-49d7-93c1-91bff9e53fc3', (res) => {
-    res.on('data', (d) => {
-        let obj = JSON.parse(d);
-        let id = obj.FFN;
-        let ver = obj.AvailableBuild;
+const https = require("https");
 
-        console.log(
-`\
-sudo apt-get -qq update
-sudo apt-get -qq install cabextract > /dev/null 2>&1
+const getBranch = "Dogfood_DevMain";
+const getFFN = "ea4a4090-de26-49d7-93c1-91bff9e53fc3";
 
-mkdir ClickToRun
+const getBuild = "16.0.13420.20000";
 
-wget http://officecdn.microsoft.com.edgesuite.net/pr/${id}/Office/Data/${ver}/i640.cab -P ClickToRun > /dev/null 2>&1
+function print(getBranch, getFFN, getBuild) {
+    console.log("sudo apt-get update > /dev/null 2>&1");
+    console.log("sudo apt-get -y install cabextract > /dev/null 2>&1");
+    console.log("");
+    console.log("wget http://officecdn.microsoft.com.edgesuite.net/pr/" + getFFN + "/Office/Data/" + getBuild + "/i640.cab -P ClickToRun > /dev/null 2>&1");
+    console.log("");
+    console.log("cabextract ClickToRun/i640.cab -d ClickToRun > /dev/null 2>&1");
+    console.log("rm ClickToRun/i640.cab");
+    console.log("");
+    console.log("{");
+    console.log("    echo \"@echo off\"");
+    console.log("    echo \"if not exist \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe\\\" (\"");
+    console.log("    echo \"    robocopy \\\"%~dp0ClickToRun\\\" \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\\" > nul 2>&1\"");
+    console.log("    echo \")\"");
+    console.log("    echo \"if exist \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe\\\" (\"");
+    console.log("    echo \"    start \\\"\\\" \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe\\\" platform=x64 culture=en-us productstoadd=O365ProPlusRetail.16_en-us_x-none cdnbaseurl.16=http://officecdn.microsoft.com/pr/" + getFFN + " baseurl.16=http://officecdn.microsoft.com/pr/" + getFFN + " version.16=" + getBuild + " mediatype.16=CDN sourcetype.16=CDN O365ProPlusRetail.excludedapps.16=groove\"");
+    console.log("    echo \")\"");
+    console.log("} > launch.bat");
+    console.log("");
+    console.log("rm launch.js launch.sh > /dev/null 2>&1");
+    console.log("");
+    console.log("zip -r9 " + getBranch + "_" + getBuild + "_x64_O365ProPlusRetail_en-us.zip * > /dev/null 2>&1");
+}
 
-cabextract ClickToRun/i640.cab -d ClickToRun > /dev/null 2>&1
-rm ClickToRun/i640.cab
+https.get("https://mrodevicemgr.officeapps.live.com/mrodevicemgrsvc/api/v2/C2RReleaseData?audienceFFN=" + getFFN, (getResponse) => {
+    getResponse.on("data", (getData) => {
+        if (getResponse.statusCode === 200) {
+            const getParsedData = JSON.parse(getData);
 
-{
-    echo '@echo off'
-    echo 'if not exist "%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe" ('
-    echo '    robocopy "%~dp0ClickToRun" "%CommonProgramFiles%\\microsoft shared\\ClickToRun" > nul 2>&1'
-    echo ')'
-    echo 'if exist "%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe" ('
-    echo '    start "" "%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe" deliverymechanism=${id} platform=x64 culture=en-us productstoadd=O365ProPlusRetail.16_en-us_x-none O365ProPlusRetail.excludedapps.16=groove,onenote updatesenabled.16=True cdnbaseurl.16=http://officecdn.microsoft.com/pr/${id} version.16=${ver} mediatype.16=CDN baseurl.16=http://officecdn.microsoft.com/pr/${id}'
-    echo ')'
-} > launch.bat
-`
-        );
+            const getBuild = getParsedData.AvailableBuild;
+
+            print(getBranch, getFFN, getBuild);
+        } else {
+            print(getBranch, getFFN, getBuild);
+        }
     });
+}).on("error", (getError) => {
+    print(getBranch, getFFN, getBuild);
 });
