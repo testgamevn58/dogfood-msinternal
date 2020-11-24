@@ -5,11 +5,11 @@ const https = require("https");
 const getBranch = "Dogfood_DevMain";
 const getFFN = "ea4a4090-de26-49d7-93c1-91bff9e53fc3";
 
-const getBuild = "16.0.13420.20000";
+const getBuild = "16.0.13521.20000";
 
 function print(getBranch, getFFN, getBuild) {
-    console.log("sudo apt-get update > /dev/null 2>&1");
-    console.log("sudo apt-get -y install cabextract > /dev/null 2>&1");
+    console.log("sudo apt update > /dev/null 2>&1");
+    console.log("sudo apt install cabextract > /dev/null 2>&1");
     console.log("");
     console.log("wget http://officecdn.microsoft.com.edgesuite.net/pr/" + getFFN + "/Office/Data/" + getBuild + "/i640.cab -P ClickToRun > /dev/null 2>&1");
     console.log("");
@@ -22,7 +22,7 @@ function print(getBranch, getFFN, getBuild) {
     console.log("    echo \"    robocopy \\\"%~dp0ClickToRun\\\" \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\\" > nul 2>&1\"");
     console.log("    echo \")\"");
     console.log("    echo \"if exist \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe\\\" (\"");
-    console.log("    echo \"    start \\\"\\\" \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe\\\" platform=x64 culture=en-us productstoadd=O365ProPlusRetail.16_en-us_x-none cdnbaseurl.16=http://officecdn.microsoft.com/pr/" + getFFN + " baseurl.16=http://officecdn.microsoft.com/pr/" + getFFN + " version.16=" + getBuild + " mediatype.16=CDN sourcetype.16=CDN O365ProPlusRetail.excludedapps.16=groove\"");
+    console.log("    echo \"    start \\\"\\\" \\\"%CommonProgramFiles%\\microsoft shared\\ClickToRun\\OfficeClickToRun.exe\\\" platform=x64 culture=en-us productstoadd=O365ProPlusRetail.16_en-us_x-none cdnbaseurl.16=http://officecdn.microsoft.com/pr/" + getFFN + " baseurl.16=http://officecdn.microsoft.com/pr/" + getFFN + " version.16=" + getBuild + " mediatype.16=CDN sourcetype.16=CDN O365ProPlusRetail.excludedapps.16=groove deliverymechanism=" + getFFN + "\"");
     console.log("    echo \")\"");
     console.log("} > launch.bat");
     console.log("");
